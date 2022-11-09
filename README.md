@@ -1,1 +1,4 @@
-# jump_estimation
+# Estimation of Jumps.
+
+
+![Consignes](./images/consignes.png)

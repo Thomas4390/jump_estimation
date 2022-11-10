@@ -111,7 +111,7 @@ def plot_number_of_trades_per_day(df: pd.DataFrame) -> None:
 
 def compute_naive_qv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
     """
-    Compute the naive Quadradic Variation
+    Compute the naive Quadratic Variation
     :param df: dataframe
     :param n: number of minutes in one day
     :param k: time step

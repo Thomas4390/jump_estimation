@@ -16,17 +16,20 @@ def convert_data(filename: str) -> None:
     df_excel = pd.read_excel(filename)
     df_excel = convert_to_datetime(df_excel)
     # Fill all missing values backwards
-    df_excel = df_excel.fillna(method="bfill")
+    df_excel = df_excel.fillna(method="ffill")
     # Drop any remaining missing values
     df_excel = df_excel.dropna()
-    df_excel.to_pickle(f"{filename[0:4]}.pkl")
+    df_excel.to_pickle(f"data/{filename[5:9]}.pkl")
 
     return None
 
 
 def from_excel_to_pkl() -> None:
 
-    file_to_convert = ["1990.xlsx", "2001.xlsx", "2007.xlsx", "2018.xlsx"]
+    file_to_convert = ["data/1990.xlsx",
+                       "data/2001.xlsx",
+                       "data/2007.xlsx",
+                       "data/2018.xlsx"]
 
     for file in file_to_convert:
         convert_data(file)
@@ -38,10 +41,10 @@ def from_excel_to_pkl() -> None:
 
 
 def concat_data() -> pd.DataFrame:
-    df_2001 = pd.read_pickle("images/data/2001.pkl")
-    df_1990 = pd.read_pickle("images/data/1990.pkl")
-    df_2007 = pd.read_pickle("images/data/2007.pkl")
-    df_2018 = pd.read_pickle("images/data/2018.pkl")
+    df_2001 = pd.read_pickle("data/2001.pkl")
+    df_1990 = pd.read_pickle("data/1990.pkl")
+    df_2007 = pd.read_pickle("data/2007.pkl")
+    df_2018 = pd.read_pickle("data/2018.pkl")
 
     df_concat = pd.concat([df_1990, df_2001, df_2007, df_2018], ignore_index=True)
 
@@ -57,4 +60,4 @@ def save_to_pickle(df: pd.DataFrame, filename: str) -> None:
 if __name__ == "__main__":
     from_excel_to_pkl()
     df_full = concat_data()
-    save_to_pickle(df_full, "full_data")
+    save_to_pickle(df_full, "data/full_data")

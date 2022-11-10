@@ -3,13 +3,12 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-
-# Create a function that can read a certain day in the data
 from numpy import ndarray
 
 
 def read_range_days(
-    df: pd.DataFrame, date: str, days: int = 1, hours: int = 0, minutes: int = 0
+        df: pd.DataFrame, date: str, days: int = 1, hours: int = 0,
+        minutes: int = 0
 ) -> pd.DataFrame:
     """
     Read a specific day in the data
@@ -47,25 +46,6 @@ def compute_total_return(df: pd.DataFrame) -> float:
     """
 
     total_return = np.log(df["Close"].iloc[-1] / df["Close"].iloc[0])
-
-    return total_return
-
-
-def compute_total_return_over_period(
-    df: pd.DataFrame, date: str, days: int = 1, hours: int = 0, minutes: int = 0
-) -> float:
-    """
-    Compute the total returns of a period of time
-    :param df: dataframe
-    :param date: date to read in the following format: 'YYYY-MM-DD'
-    :param days: number of days to read
-    :param hours: number of hours to read
-    :param minutes: number of minutes to read
-    """
-
-    df_range = read_range_days(df, date, days, hours, minutes)
-
-    total_return = np.log(df_range["Close"].iloc[-1] / df_range["Close"].iloc[0])
 
     return total_return
 
@@ -123,28 +103,12 @@ def compute_naive_qv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
     naives_qv = np.zeros(n_days)
 
     for day in range(n_days):
-        for i in range(int(n_k)):
-            naives_qv[day] += df["LogReturn"].iloc[day * n + int(i * k)] ** 2
+        for i in range(1, int(n_k)):
+            naives_qv[day] += \
+                (np.log(df["Close"].iloc[day * n + i * k])
+                 - (np.log(df["Close"].iloc[day * n + (i - 1) * k]))) ** 2
 
     return naives_qv
-
-
-def compute_realized_variance_over_period(
-    df: pd.DataFrame, date: str, days: int = 1, hours: int = 0, minutes: int = 0
-) -> ndarray:
-    """
-    Compute the total returns of a period of time
-    :param df: dataframe
-    :param date: date to read in the following format: 'YYYY-MM-DD'
-    :param days: number of days to read
-    :param hours: number of hours to read
-    :param minutes: number of minutes to read
-    """
-
-    df_range = read_range_days(df, date, days, hours, minutes)
-    realized_variance = np.sum(df_range["LogReturn"] ** 2)
-
-    return realized_variance
 
 
 def plot_naive_qv(df: pd.DataFrame, k_list: list[int]) -> None:
@@ -176,7 +140,8 @@ def plot_naive_qv(df: pd.DataFrame, k_list: list[int]) -> None:
     return None
 
 
-def compute_subsampling_qv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
+def compute_subsampling_qv(df: pd.DataFrame, n: int = 390,
+                           k: int = 1) -> ndarray:
     """
     Compute the Subsampling Quadratic Variance
     :param df: dataframe
@@ -190,14 +155,18 @@ def compute_subsampling_qv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarra
 
     for subgrid in range(k):
         for day in range(n_days):
-            for i in range(int(n_k)):
-                rv_subsampling[day, subgrid] += (
-                    df["LogReturn"].iloc[day * n + int(i * k) + subgrid] ** 2
-                )
+            for i in range(1, int(n_k)):
+                rv_subsampling[day, subgrid] += \
+                    (np.log(df["Close"].iloc[day * n + i * k + subgrid])
+                     - (np.log(df["Close"].iloc[
+                                   day * n + (i - 1) * k + subgrid]))) ** 2
 
     mean_rv_subsampling = np.mean(rv_subsampling, axis=1)
 
     return mean_rv_subsampling
+
+
+
 
 
 def plot_subsampling_qv(df: pd.DataFrame, k_list: list[int]) -> None:
@@ -242,9 +211,11 @@ def plot_historical_events(df: pd.DataFrame) -> None:
         n_days_array = np.arange(n_days)
         y = np.full(n_days, np.nan)
         plt.plot(n_days_array, y)
-        plt.axvline(x=20, color="orange", label="Black January", linestyle="--")
+        plt.axvline(x=20, color="orange", label="Black January",
+                    linestyle="--")
         plt.axvline(x=149, color="blue", label="Golf War", linestyle="--")
-        plt.axvline(x=162, color="aqua", label="German Reunification Announced", linestyle="--")
+        plt.axvline(x=162, color="aqua",
+                    label="German Reunification Announced", linestyle="--")
         plt.axvline(x=188, color="red", label="Reunification", linestyle="--")
 
     elif year == 2001:
@@ -252,10 +223,13 @@ def plot_historical_events(df: pd.DataFrame) -> None:
         n_days_array = np.arange(n_days)
         y = np.full(n_days, np.nan)
         plt.plot(n_days_array, y)
-        plt.axvline(x=63, color="orange", label="Hainan Island Incident", linestyle="--")
-        plt.axvline(x=174, color="aqua", label="September 11 Attacks", linestyle="--")
+        plt.axvline(x=63, color="orange", label="Hainan Island Incident",
+                    linestyle="--")
+        plt.axvline(x=174, color="aqua", label="September 11 Attacks",
+                    linestyle="--")
         plt.axvline(x=193, color="red", label="War on Terror", linestyle="--")
-        plt.axvline(x=214, color="blue", label="Sabena Bankruptcy", linestyle="--")
+        plt.axvline(x=214, color="blue", label="Sabena Bankruptcy",
+                    linestyle="--")
 
     elif year == 2007:
         n_days = len(df) // n
@@ -269,11 +243,14 @@ def plot_historical_events(df: pd.DataFrame) -> None:
             linestyle="--",
         )
         plt.axvline(
-            x=125, color="orange", label="Bank of England Emergency", linestyle="--"
+            x=125, color="orange", label="Bank of England Emergency",
+            linestyle="--"
         )
-        plt.axvline(x=156, color="orchid", label="Subprimes Panic", linestyle="--")
+        plt.axvline(x=156, color="orchid", label="Subprimes Panic",
+                    linestyle="--")
         plt.axvline(
-            x=242, color="aqua", label="Delta Financial Bankruptcy", linestyle="--"
+            x=242, color="aqua", label="Delta Financial Bankruptcy",
+            linestyle="--"
         )
 
     elif year == 2018:
@@ -282,10 +259,12 @@ def plot_historical_events(df: pd.DataFrame) -> None:
         y = np.full(n_days, np.nan)
         plt.plot(n_days_array, y)
         plt.axvline(
-            x=24, color="purple", label="Stock Market Correction", linestyle="--"
+            x=24, color="purple", label="Stock Market Correction",
+            linestyle="--"
         )
         plt.axvline(x=40, color="Gold", label="Trade War", linestyle="--")
-        plt.axvline(x=87, color="red", label="Sanctions on Iran", linestyle="--")
+        plt.axvline(x=87, color="red", label="Sanctions on Iran",
+                    linestyle="--")
         plt.axvline(x=215, color="blue", label="BREXIT", linestyle="--")
 
     else:
@@ -308,13 +287,16 @@ def compute_naive_bv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
     naives_bv = np.zeros(n_days)
 
     for day in range(n_days):
-        for i in range(1, int(n_k)):
+        for i in range(2, int(n_k)):
             naives_bv[day] += np.abs(
-                df["LogReturn"].iloc[day * n + int(i * k)]
-                * df["LogReturn"].iloc[day * n + int(i * k) - 1]
+                ((np.log(df["Close"].iloc[day * n + i * k])
+                 - (np.log(df["Close"].iloc[day * n + (i - 1) * k])))
+                    * (np.log(df["Close"].iloc[day * n + (i - 1) * k])
+                          - (np.log(df["Close"].iloc[day * n + (i - 2) * k]))))
             )
     naives_bv = (np.pi / 2) * naives_bv
     return naives_bv
+
 
 def plot_naive_bv(df: pd.DataFrame, k_list: list[int]) -> None:
     """
@@ -344,7 +326,9 @@ def plot_naive_bv(df: pd.DataFrame, k_list: list[int]) -> None:
 
     return None
 
-def compute_subsampling_bv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
+
+def compute_subsampling_bv(df: pd.DataFrame, n: int = 390,
+                           k: int = 1) -> ndarray:
     """
     Compute the subsampling bipower variance
     :param df: dataframe
@@ -360,8 +344,10 @@ def compute_subsampling_bv(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarra
         for day in range(n_days):
             for i in range(1, int(n_k)):
                 bv_subsampling[day, subgrid] += np.abs(
-                    df["LogReturn"].iloc[day * n + int(i * k) + subgrid]
-                    * df["LogReturn"].iloc[day * n + int(i * k) - 1 + subgrid]
+                    ((np.log(df["Close"].iloc[day * n + i * k + subgrid])
+                      - (np.log(df["Close"].iloc[day * n + (i - 1) * k + subgrid])))
+                     * (np.log(df["Close"].iloc[day * n + (i - 1) * k + subgrid])
+                        - (np.log(df["Close"].iloc[day * n + (i - 2) * k + subgrid]))))
                 )
 
     bv_subsampling = (np.pi / 2) * bv_subsampling
@@ -397,7 +383,9 @@ def plot_subsampling_bv(df: pd.DataFrame, k_list: list[int]) -> None:
 
     return None
 
-def compute_sum_squared_jumps(df: pd.DataFrame, n: int = 390, k: int = 1) -> ndarray:
+
+def compute_sum_squared_jumps(df: pd.DataFrame, n: int = 390,
+                              k: int = 1) -> ndarray:
     """
     Compute the estimated Sum of squared Jumps
     :param df: dataframe
@@ -407,19 +395,20 @@ def compute_sum_squared_jumps(df: pd.DataFrame, n: int = 390, k: int = 1) -> nda
     n_days = len(df) // n
     sum_squared_jumps = np.zeros(n_days)
 
-    naive_qv = compute_naive_qv(df, k=k)
-    naive_bv = compute_naive_bv(df, k=k)
+    naive_qv = compute_subsampling_qv(df, k=k)
+    naive_bv = compute_subsampling_bv(df, k=k)
 
     diff = naive_qv - naive_bv
 
     for i in range(n_days):
-    # Je passe par cette méthode car le maximum classique a du mal à fonctionner
+        # Je passe par cette méthode car le maximum classique a du mal à fonctionner
         if diff[i] > 0:
             sum_squared_jumps[i] = diff[i]
         else:
             sum_squared_jumps[i] = 0
 
     return sum_squared_jumps
+
 
 def plot_ssj(df: pd.DataFrame, k_list: list[int]) -> None:
     """
@@ -448,5 +437,3 @@ def plot_ssj(df: pd.DataFrame, k_list: list[int]) -> None:
     plt.close()
 
     return None
-
-

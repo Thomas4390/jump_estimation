@@ -42,15 +42,15 @@ def compute_rv(annee: str, naive: bool, timesteps: list[int]) -> None:
                 np.abs(nextLogReturn * currentLogReturn))]
 
         if naive:
-            plt.title(f'{annee[5:9]} | Naive Estimation of QV')
+            plt.title(f'{annee[5:9]} | Naive Estimation of QV', fontsize=20)
             method = 'naive'
         else:
-            plt.title(f'{annee[5:9]} | Subsampling Estimation of QV')
+            plt.title(f'{annee[5:9]} | Subsampling Estimation of QV', fontsize=20)
             method = 'subsampling'
 
         plt.plot(RV, label=f'{method} QV | k = {timestep} min')
-        plt.xlabel('Days')
-        plt.ylabel('QV')
+        plt.xlabel('Days', fontsize=20)
+        plt.ylabel('QV', fontsize=20)
         plt.legend()
         plt.savefig(f"images2/{annee[5:9]}_{method}_QV.png")
 
@@ -96,15 +96,15 @@ def compute_bv(annee: str, naive: bool, timesteps: list[int]) -> None:
                 np.abs(nextLogReturn * currentLogReturn))]
 
         if naive:
-            plt.title(f'{annee[5:9]} | Naive Estimation of IV')
+            plt.title(f'{annee[5:9]} | Naive Estimation of IV', fontsize=20)
             method = 'naive'
         else:
-            plt.title(f'{annee[5:9]} | Subsampling Estimation of IV')
+            plt.title(f'{annee[5:9]} | Subsampling Estimation of IV', fontsize=20)
             method = 'subsampling'
 
         plt.plot(BV, label=f'{method} IV | k = {timestep} min')
-        plt.xlabel('Days')
-        plt.ylabel('BV')
+        plt.xlabel('Days', fontsize=20)
+        plt.ylabel('BV', fontsize=20)
         plt.legend()
         plt.savefig(f"images2/{annee[5:9]}_{method}_IV.png")
 
@@ -152,15 +152,15 @@ def compute_jumps(annee: str, naive: bool, timesteps: list[int]) -> None:
         JUMP = np.maximum(np.array(RV) - np.array(BV), np.zeros(len(RV)))
 
         if naive:
-            plt.title(f'{annee[5:9]} | Naive Estimation of Jumps')
+            plt.title(f'{annee[5:9]} | Naive Estimation of Jumps', fontsize=20)
             method = 'naive'
         else:
-            plt.title(f'{annee[5:9]} |Subsampling Estimation of Jumps')
+            plt.title(f'{annee[5:9]} |Subsampling Estimation of Jumps', fontsize=20)
             method = 'subsampling'
 
         plt.plot(JUMP, label=f'{method} Jumps | k = {timestep} min')
-        plt.xlabel('Days')
-        plt.ylabel('Sum Square of Jumps')
+        plt.xlabel('Days', fontsize=20)
+        plt.ylabel('Sum Square of Jumps', fontsize=20)
         plt.legend()
         plt.savefig(f"images2/{annee[5:9]}_{method}_Jumps.png")
 
